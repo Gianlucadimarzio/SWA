@@ -1,17 +1,26 @@
 package model;
 
 public class Autore {
-
+    private String id;
     private String nome;
     private String cognome;
 
 
     public Autore() {
+        id = "";
         nome = "";
         cognome = "";
 
     }
 
+    public String getId() {
+        return id;
+    }
+    
+    public void setId( String id ){
+        this.id = id;
+    }
+    
     public String getNome() {
         return nome;
     }

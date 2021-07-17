@@ -22,7 +22,7 @@ public class DiscoDeserializer extends JsonDeserializer<Disco> {
         JsonNode node = jp.getCodec().readTree(jp);
 
         if (node.has("titolo")) d.setTitolo( node.get("titolo").toString() );  
-        if (node.has("autore")) d.setAutore( node.get("autore"), Autore.class ); 
+        if (node.has("autore")) d.setAutore(jp.getCodec().treeToValue(node.get("autore"), Autore.class));       
         if (node.has("tracce")) {
             JsonNode ne = node.get("tracce");
             List<Traccia> tracce = new ArrayList<>();

@@ -14,7 +14,7 @@ public class CollezioneSerializer extends JsonSerializer<Collezione> {
     public void serialize(Collezione item, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
         jgen.writeStartObject();
             jgen.writeObjectField("titolo", item.getTitolo()); 
-            jgen.writeObjectField("creatore", item.getUtente());
+            jgen.writeObjectField("utente", item.getUtente());
             jgen.writeObjectField("privacy", item.getPrivacy());
             jgen.writeObjectField("dischi", item.getDischi());
         jgen.writeEndObject();

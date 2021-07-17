@@ -1,45 +1,26 @@
 package resources;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import model.Collezione;
-import model.CollezioneAPIDummy;
-import model.CollezioneRepoAPI;
-import model.RepoError;
-import model.Disco;
 import model.Traccia;
-import model.TracciaAPIDummy;
-import model.TracciaRepoAPI;
-import model.Utente;
 import rest.RESTWebApplicationException;
 
-@Path("tracce")
 public class TracciaResource {
-    private static final TracciaRepoAPI api = new TracciaAPIDummy();
+    private final Traccia t;
+    
+    public TracciaResource( Traccia t ){
+        this.t = t;
+    }
+
     
     @GET
     @Produces("application/json")
-    @Path("{ titolo: [a-zA-Z0-9]+ }")
-    public Response getTraccia( @PathParam("titolo") String titolo ) {
+    public Response getTraccia() {
         try{
-            Traccia result = api.getTraccia( titolo );
-            return Response.ok(result).build();    
+            return Response.ok(t).build();    
         }
-        catch (Exception ex) { throw new RESTWebApplicationException(ex); }
+        catch (Exception ex) {  throw new RESTWebApplicationException(ex); }
 
     }
     

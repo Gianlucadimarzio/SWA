@@ -7,9 +7,15 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import jackson.ObjectMapperContextResolver;
+import resources.AutoriResource;
 import resources.CollezioneResource;
+import resources.CollezioniResource;
+import resources.DischiResource;
 import resources.DiscoResource;
+import resources.TracceResource;
 import resources.TracciaResource;
+import security.AutenticazioneResource;
+import security.LoggedFilter;
 
 /**
  *
@@ -22,25 +28,24 @@ public class RESTApp extends Application {
 
     public RESTApp() {
         HashSet<Class<?>> c = new HashSet<>();
-        //aggiungiamo tutte le *root resurces* (cioè quelle
-        //con l'annotazione Path) che vogliamo pubblicare
+       
+        c.add(CollezioniResource.class);
         c.add(CollezioneResource.class);
+        c.add(AutoriResource.class);
+        //c.add(AutoreResource.class);
+        c.add(DischiResource.class);
         c.add(DiscoResource.class);
+        c.add(TracceResource.class);
         c.add(TracciaResource.class);
 
-        //c.add(ProdottiResource.class);
-        //c.add(AutenticazioneResource.class);
+        c.add(AutenticazioneResource.class);
 
-        //aggiungiamo il provider Jackson per poter
-        //usare i suoi servizi di serializzazione e 
-        //deserializzazione JSON
         c.add(JacksonJsonProvider.class);
 
-        //necessario se vogliamo una (de)serializzazione custom di qualche classe    
         c.add(ObjectMapperContextResolver.class);
 
         //esempio di autenticazione
-        //c.add(LoggedFilter.class);
+        c.add(LoggedFilter.class);
 
         //aggiungiamo il filtro che gestisce gli header CORS
         //c.add(CORSFilter.class);

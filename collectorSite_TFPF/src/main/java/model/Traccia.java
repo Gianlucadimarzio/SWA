@@ -1,14 +1,26 @@
 package model;
 
-public class Traccia {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+public class Traccia {
+    @JsonIgnore
+    private String id;
     private String titolo;
-    private int durata;
+    private String durata;
 
     public Traccia() {
+        id = "";
         titolo = "";
-        durata = 0;
+        durata = "";
 
+    }
+    
+    public String getId() {
+        return id;
+    }
+    
+    public void setId( String id ){
+        this.id = id;
     }
 
     public String getTitolo() {
@@ -19,11 +31,11 @@ public class Traccia {
         this.titolo = titolo;
     }
 
-    public int getDurata() {
+    public String getDurata() {
         return durata;
     }
 
-    public void setDurata(int durata) {
+    public void setDurata(String durata) {
         this.durata = durata;
     }
     

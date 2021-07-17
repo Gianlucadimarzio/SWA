@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface TracciaRepoAPI {
 
-    Traccia getTraccia(String titolo) throws RepoError;
+    Traccia getTraccia(String id) throws RepoError;
 }

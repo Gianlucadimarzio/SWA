@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
+import model.Autore;
 import model.Collezione;
 import model.Disco;
+import model.Traccia;
 
 @Provider
 public class ObjectMapperContextResolver implements ContextResolver<ObjectMapper> {
@@ -34,7 +36,12 @@ public class ObjectMapperContextResolver implements ContextResolver<ObjectMapper
         
         customSerializer.addSerializer(Disco.class, new DiscoSerializer());
         customSerializer.addDeserializer(Disco.class, new DiscoDeserializer());
+        
+        customSerializer.addSerializer(Autore.class, new AutoreSerializer());
+        customSerializer.addDeserializer(Autore.class, new AutoreDeserializer());
 
+        customSerializer.addSerializer(Traccia.class, new TracciaSerializer());
+        customSerializer.addDeserializer(Traccia.class, new TracciaDeserializer());
         mapper.registerModule(customSerializer);
 
         return mapper;

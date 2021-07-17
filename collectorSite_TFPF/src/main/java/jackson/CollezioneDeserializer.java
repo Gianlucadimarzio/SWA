@@ -23,7 +23,7 @@ public class CollezioneDeserializer extends JsonDeserializer<Collezione> {
         JsonNode node = jp.getCodec().readTree(jp);
 
         if (node.has("titolo")) c.setTitolo( node.get("titolo").toString() );  
-        if (node.has("creatore")) c.setUtente( node.get("creatore"), Utente.class ); 
+        if( node.has("utente"))   c.setUtente(jp.getCodec().treeToValue(node.get("utente"), Utente.class));
         if (node.has("privacy")) c.setPrivacy( node.get("privacy").toString() ); 
         if (node.has("dischi")) {
             JsonNode ne = node.get("dischi");

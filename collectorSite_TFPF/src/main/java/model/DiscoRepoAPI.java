@@ -2,9 +2,12 @@ package model;
 
 import java.net.URI;
 import java.util.List;
+import javax.ws.rs.core.UriInfo;
 
 public interface DiscoRepoAPI {
 
-    List<Disco> getDischi() throws RepoError;
-    Disco getDisco(String titolo) throws RepoError;
+    List<String> getDischiByCollezione( Collezione c , UriInfo uribuilder ) throws RepoError;
+    Disco getDisco(String id) throws RepoError;
+    boolean updateDisco( Disco disco, String idDisco  ) throws RepoError;
+    String insertDisco( String idCollezione, Disco d, String idUtente ) throws RepoError;
 }

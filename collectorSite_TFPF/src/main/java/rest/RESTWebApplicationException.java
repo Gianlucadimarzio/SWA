@@ -24,7 +24,7 @@ public class RESTWebApplicationException extends WebApplicationException {
     public RESTWebApplicationException(int status, String message) {
         super(Response.status(status)
                 .entity(message)
-                .type("text/plain")
+                .type("application/json")
                 .build());
     }
 }

@@ -1,14 +1,17 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CollezioneCondivisa {
 
     private Collezione collezione;
-    private Utente utenteCondivisione;
+    private List<Utente> utenteCondivisione;
 
 
     public CollezioneCondivisa() {
         collezione = new Collezione();
-        utenteCondivisione = new Utente();
+        utenteCondivisione = new ArrayList();
 
     }
 
@@ -20,11 +23,11 @@ public class CollezioneCondivisa {
         this.collezione = collezione;
     }
 
-    public Utente getUtenteCondivisione() {
+    public List<Utente> getUtenteCondivisione() {
         return utenteCondivisione;
     }
 
-    public void setUtenteCondivisione(Utente utenteCondivisione) {
+    public void setUtenteCondivisione(List<Utente> utenteCondivisione) {
         this.utenteCondivisione = utenteCondivisione;
     }
     

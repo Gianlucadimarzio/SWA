@@ -1,68 +1,47 @@
 package resources;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import model.Collezione;
-import model.CollezioneAPIDummy;
-import model.CollezioneRepoAPI;
-import model.RepoError;
 import model.Disco;
 import model.DiscoAPIDummy;
 import model.DiscoRepoAPI;
-import model.Utente;
 import rest.RESTWebApplicationException;
 
-@Path("dischi")
 public class DiscoResource {
-    
-    private static final DiscoRepoAPI api = new DiscoAPIDummy();
+    private final Disco d;
+    private final Collezione c;
 
-    
-    @GET
-    @Produces("application/json")
-    public Response getDischi( @Context UriInfo uribuilder ){
-        List<String> l = new ArrayList();
-        try {
-            List<Disco> results = api.getDischi();
-            for(Disco result : results){
-                URI uri = uribuilder.getBaseUriBuilder().path(DiscoResource.class).path( DiscoResource.class,"getDisco" ).build(result.getTitolo());
-                l.add( uri.toString() );
-            }
-
-        } catch (RepoError ex) {
-            return Response.serverError().build();
-        }
-        return Response.ok(l).build();
+    public DiscoResource( Collezione c, Disco d) {
+        this.d = d;
+        this.c = c;
     }
     
     @GET
     @Produces("application/json")
-    @Path("{ titolo: [a-zA-Z0-9]+ }")
-    public Response getDisco( @PathParam("titolo") String titolo, @Context UriInfo uribuilder ){
-        Disco d = new Disco();
+    public Response getDisco( @Context UriInfo uribuilder ){
         try {
-            d = api.getDisco(titolo);
-            
+            List<Map<String, Object>> l = d.DiscoDummy(this.c , uribuilder );
             if( d == null ) { return Response.status(Response.Status.NOT_FOUND).entity("Disco non trovato").build(); }
-            return Response.ok(d.DiscoDummy(uribuilder)).build();           
+            return Response.ok(l).build();           
         }
         catch (Exception ex) { throw new RESTWebApplicationException(ex); }
         
     }
+    
+    @Path("tracce")
+    public TracceResource getTracce( @Context UriInfo uribuilder ){
+        return new TracceResource( this.c, this.d, uribuilder );
+    }  
+
+    
     
     
     
