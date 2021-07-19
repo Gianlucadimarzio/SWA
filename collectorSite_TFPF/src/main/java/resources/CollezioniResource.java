@@ -194,11 +194,15 @@ public class CollezioniResource {
     public Response searchDiscoPrivato( @Context SecurityContext sec, @FormParam("nomeDisco") String nomeDisco, @FormParam("durataMaxDisco") String maxDurata, @FormParam("durataMinDisco") String minDurata, @Context UriInfo uribuilder ){
         if( nomeDisco == null || maxDurata == null || minDurata == null ) return Response.status(404).build();
         String idUser = sec.getUserPrincipal().getName();
-        List<String> l = api.searchDiscoPrivato( nomeDisco, maxDurata, minDurata, idUser, uribuilder );
-        if( l == null ) return Response.status(404).build();
+        List<String> l = null;
+        try {
+            l = api.searchDiscoPrivato( nomeDisco, maxDurata, minDurata, idUser, uribuilder );
+            if( l == null ) return Response.status(404).build();
 
+        } catch (RepoError ex) {
+            Logger.getLogger(CollezioniResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        
         return Response.ok(l).build();
     }
     
@@ -208,8 +212,13 @@ public class CollezioniResource {
     @Produces("application/json")
     public Response searchDiscoPubblico( @FormParam("nomeDisco") String nomeDisco, @FormParam("durataMaxDisco") String maxDurata, @FormParam("durataMinDisco") String minDurata, @Context UriInfo uribuilder ){
         if( nomeDisco == null || maxDurata == null || minDurata == null ) return Response.ok("non we").build();;
-        List<String> l = api.searchDiscoPubblico( nomeDisco, maxDurata, minDurata, uribuilder );
-        if( l == null ) return Response.status(404).build();
+        List<String> l = null;
+        try {
+            l = api.searchDiscoPubblico( nomeDisco, maxDurata, minDurata, uribuilder );
+            if( l == null ) return Response.status(404).build();
+        } catch (RepoError ex) {
+            Logger.getLogger(CollezioniResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         return Response.ok(l).build();
     }
@@ -222,70 +231,51 @@ public class CollezioniResource {
     public Response searchDiscoCondiviso( @Context SecurityContext sec, @FormParam("nomeDisco") String nomeDisco, @FormParam("durataMaxDisco") String maxDurata, @FormParam("durataMinDisco") String minDurata, @Context UriInfo uribuilder ){
         if( nomeDisco == null || maxDurata == null || minDurata == null ) return Response.status(404).build();
         String idUser = sec.getUserPrincipal().getName();
-        List<String> l = api.searchDiscoCondiviso( nomeDisco, maxDurata, minDurata, idUser, uribuilder );
-        if( l == null ) return Response.status(404).build();
+        List<String> l = null;
+        try {
+            l = api.searchDiscoCondiviso( nomeDisco, maxDurata, minDurata, idUser, uribuilder );
+            if( l == null ) return Response.status(404).build();
+
+        } catch (RepoError ex) {
+            Logger.getLogger(CollezioniResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         
         return Response.ok(l).build();
     }
     
+
     
+    @GET
+    @Path("statistiche")
+    @Produces("application/json")
+    public Response getStatistichePubbliche ( @Context UriInfo uribuilder ){
+        List<Map<String, Object>> l = new ArrayList();
+        try {
+            l = api.getStatistichePubbliche();
+            return Response.ok(l).build();
+
+        }
+        catch (RepoError ex) { return Response.serverError().build(); }  
+          
+    }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    @GET
+    @Path("privata/statistiche")
+    @Produces("application/json")
+    @Logged
+    public Response getStatistichePrivate ( @Context SecurityContext sec, @Context UriInfo uribuilder ){
+        String idUser = sec.getUserPrincipal().getName();
+        List<Map<String, Object>> l = new ArrayList();
+        try {
+            l = api.getStatistichePrivate( idUser );
+            return Response.ok(l).build();
+
+        }
+        catch (RepoError ex) { return Response.serverError().build(); }  
+          
+    }
+
     
     
     /*

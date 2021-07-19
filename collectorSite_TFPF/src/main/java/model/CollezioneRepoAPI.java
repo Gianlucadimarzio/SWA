@@ -2,6 +2,7 @@ package model;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.UriInfo;
 
 public interface CollezioneRepoAPI {
@@ -15,8 +16,10 @@ public interface CollezioneRepoAPI {
     boolean addDiscoToCollezione(String titolo, Disco d) throws RepoError;
     List<Disco> getDischi( String titolo ) throws RepoError;
     boolean checkUtenteShare( String idCollezione, String idUtenteShare ) throws RepoError;
-    List<String> searchDiscoPrivato( String nomeDisco, String maxDurata, String minDurata, String idUser, UriInfo uribuilder );
-    List<String> searchDiscoPubblico( String nomeDisco, String maxDurata, String minDurata, UriInfo uribuilder );
-    List<String> searchDiscoCondiviso( String nomeDisco, String maxDurata, String minDurata, String idUser, UriInfo uribuilder );
+    List<String> searchDiscoPrivato( String nomeDisco, String maxDurata, String minDurata, String idUser, UriInfo uribuilder ) throws RepoError;
+    List<String> searchDiscoPubblico( String nomeDisco, String maxDurata, String minDurata, UriInfo uribuilder ) throws RepoError;
+    List<String> searchDiscoCondiviso( String nomeDisco, String maxDurata, String minDurata, String idUser, UriInfo uribuilder ) throws RepoError;
+    List<Map<String, Object>> getStatistichePubbliche() throws RepoError;
+    List<Map<String, Object>> getStatistichePrivate( String idUser ) throws RepoError;
 
 }

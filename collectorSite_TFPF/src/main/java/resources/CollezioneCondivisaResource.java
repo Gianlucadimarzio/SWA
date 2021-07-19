@@ -56,17 +56,14 @@ public class CollezioneCondivisaResource {
     @Produces("application/json")
     @Logged
     public Response getCollezione( @Context SecurityContext sec, @Context UriInfo uribuilder ) throws RESTWebApplicationException {
+        CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
+        List<Map<String, Object>> l = c.CollezioneCondivisaDummy( uribuilder, this.utenteShare );
         try {             
             String idUser = sec.getUserPrincipal().getName();
             
-            if ( c.getUtente().getId().equals( idUser ) ){
-                List<Map<String, Object>> l;
-                l = c.CollezioneCondivisaDummy( uribuilder, this.utenteShare );
-                CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
-                if( ! ca.checkUtenteShare( c.getId() , this.utenteShare ) ){
-                    return Response.status(Response.Status.UNAUTHORIZED).build();
-                }
-                return Response.ok(l).build(); 
+            if ( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ){
+                    return Response.ok(l).build();
+
             }
             else { return Response.status(Response.Status.UNAUTHORIZED).build(); }
           
@@ -94,9 +91,9 @@ public class CollezioneCondivisaResource {
         }
         CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
         try {
-            if( ! ca.checkUtenteShare( this.c.getId() , this.utenteShare ) ){
+            if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ) ){
                 return Response.status(Response.Status.UNAUTHORIZED).build();
-            }
+            } 
         } catch (RepoError ex) {
             Logger.getLogger(CollezioneCondivisaResource.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -117,7 +114,7 @@ public class CollezioneCondivisaResource {
             List<Map<String, Object>> l = d.DiscoCondivisoDummy( this.utenteShare, this.c , uribuilder );
             if( d == null ) { return Response.status(Response.Status.NOT_FOUND).entity("Disco non trovato").build(); }
                 CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
-                if( ! ca.checkUtenteShare( this.c.getId() , this.utenteShare ) ){
+                if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ) ){
                     return Response.status(Response.Status.UNAUTHORIZED).build();
                 }
             
@@ -150,7 +147,7 @@ public class CollezioneCondivisaResource {
                 l.add( m );
             }
             CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
-            if( ! ca.checkUtenteShare( this.c.getId() , this.utenteShare ) ){
+            if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ) ){
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
         } catch (RepoError ex) {
@@ -173,7 +170,7 @@ public class CollezioneCondivisaResource {
             t = apiTraccia.getTraccia(id);
             if( t == null ) { return null; }
             CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
-                if( ! ca.checkUtenteShare( this.c.getId() , this.utenteShare ) ){
+            if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ) ){
                     return Response.status(Response.Status.UNAUTHORIZED).build();
             }
             return Response.ok(t).build();           
