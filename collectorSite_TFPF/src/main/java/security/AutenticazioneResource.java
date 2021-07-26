@@ -15,20 +15,13 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import model.Collezione;
-import model.CollezioneAPIDummy;
 
-/**
- *
- * @author didattica /rest/auth
- *
- */
+
 @Path("v1")
 public class AutenticazioneResource {
 
@@ -36,7 +29,6 @@ public class AutenticazioneResource {
     @Path("/login")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response doLogin(@Context UriInfo uriinfo,
-            //un altro modo per ricevere e iniettare i parametri con JAX-RS...
             @FormParam("username") String username,
             @FormParam("password") String password) {
         try {
@@ -53,7 +45,7 @@ public class AutenticazioneResource {
             }
             else { return Response.status(Response.Status.UNAUTHORIZED).entity("CREDENZIALI NON VALIDE").build(); }
         }
-        catch (Exception e) { return Response.ok(Response.Status.UNAUTHORIZED).build(); /*return Response.status(Response.Status.UNAUTHORIZED).build();*/ }
+        catch (Exception e) { return Response.status(Response.Status.UNAUTHORIZED).build(); }
     }
 
     @Logged

@@ -15,7 +15,6 @@ import resources.CollezionePrivataResource;
 import resources.CollezioneResource;
 import resources.CollezioniResource;
 import resources.DischiResource;
-import resources.DiscoResource;
 
 
 public class CollezioneAPIDummy implements CollezioneRepoAPI {    
@@ -140,9 +139,6 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
                 
             }
             
-            
-            
-            
             sql = "SELECT collezione.id as idC, titolo, privacy FROM collezione, collezione_condivisa WHERE privacy = 'condivisa' AND collezione_condivisa.id_utente = " + id +" AND collezione.id_utente <> collezione_condivisa.id_utente";
             pst = con.prepareStatement(sql);
             rs = pst.executeQuery();
@@ -185,27 +181,42 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
     }
     
     @Override
-    public boolean checkUtenteShare( String idCollezione, String idUtenteShare ){
+    public boolean checkUtenteShare( String idCollezione, String idUtenteShare, String idUtenteLog ){
         try{
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/collectorsite","root",""); 
-            String sql = "SELECT * FROM collezione_condivisa WHERE id_collezione = " + idCollezione +" AND id_utente = " + idUtenteShare;
-            PreparedStatement pst = con.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
-            if( rs.next() ){
-                return true;
-            } else {
-                return false;
+            Connection con; String sql; PreparedStatement pst; ResultSet rs; boolean flag = false;
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/collectorsite","root",""); 
+            if( !idUtenteShare.equals(idUtenteLog) ){
+                sql = "SELECT * FROM collezione WHERE id = " + idCollezione +" AND id_utente = " + idUtenteShare;
+                pst = con.prepareStatement(sql);
+                rs = pst.executeQuery();
+                if( rs.next() ){ flag = true; }
+                
+                sql = "SELECT * FROM collezione_condivisa WHERE id_collezione = " + idCollezione +" AND id_utente = " + idUtenteShare;
+                pst = con.prepareStatement(sql);
+                rs = pst.executeQuery();
+                if( rs.next() ){ flag = true; }
+                
+                if( flag == false ){ return false; }
             }
+            //L'UTENTE LOGGATO E' IL CREATORE DEDLLA COLLEZIONE        
+            sql = "SELECT * FROM collezione WHERE id = " + idCollezione +" AND id_utente = " + idUtenteLog;
+            pst = con.prepareStatement(sql);
+            rs = pst.executeQuery();            
+            if( rs.next() ){ return true; }
+            
+            //L'UTENTE LOGGATO CONDIVIDE QUELLA COLLEZIONE
+            sql = "SELECT * FROM collezione_condivisa WHERE id_collezione = " + idCollezione +" AND id_utente = " + idUtenteLog;
+            pst = con.prepareStatement(sql);
+            rs = pst.executeQuery();
+            if( rs.next() ){ return true; }
+            
+            return false;
+            
         }
-        catch (SQLException ex) { return false; } 
-        catch (ClassNotFoundException ex) {
-            Logger.getLogger(CollezioneAPIDummy.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return true;
-
+        catch (Exception ex) { return false; } 
     }
-    
+     
     
     //COLLEZIONI CONDIVISE CON UNO SPECIFICO UTENTE
     @Override
@@ -246,6 +257,40 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
                 collezione.setDischi(dischi);             
                 l.add(collezione);
             }
+            
+            sql = "SELECT collezione.id as idC, titolo, privacy FROM collezione, collezione_condivisa WHERE privacy = 'condivisa' AND collezione_condivisa.id_utente = " + utente;
+            pst = con.prepareStatement(sql);
+            rs = pst.executeQuery();
+            while( rs.next() ){
+
+                Collezione collezione = new Collezione();
+                collezione.setId(rs.getString("idC"));
+                collezione.setTitolo(rs.getString("titolo"));
+                collezione.setPrivacy(rs.getString("privacy"));
+                String sqlUtente = "SELECT * FROM utente WHERE id =" + utente;
+                PreparedStatement pstUtente = con.prepareStatement(sqlUtente);
+                ResultSet rsUtente = pstUtente.executeQuery();               
+                Utente u = new Utente(); 
+                if( rsUtente.next() ){
+                    u.setUsername( rsUtente.getString("username") );
+                    u.setId( rsUtente.getString("id") );
+                    collezione.setUtente(u);
+                }
+                else { return null; }
+                String sqlDischi = "SELECT d.id as idD, d.titolo as titoloD FROM dischi_collezione dc JOIN disco d ON (d.id=dc.id_disco) WHERE dc.id_collezione = " +rs.getString("idC");
+                PreparedStatement pstDischi = con.prepareStatement(sqlDischi);
+                ResultSet rsDischi = pstDischi.executeQuery();
+                List<Disco> dischi = new ArrayList();
+                while( rsDischi.next() ){
+                    Disco disco = new Disco();
+                    disco.setId(rsDischi.getString("idD"));
+                    disco.setTitolo(rsDischi.getString("titoloD"));
+                    dischi.add(disco);
+                }
+                collezione.setDischi(dischi);
+                l.add( collezione );
+            }
+            
             con.close();
             return l;
         }
@@ -440,14 +485,14 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
     @Override
     public List<String> searchDiscoCondiviso( String nomeDisco, String maxDurata, String minDurata, String idUser, UriInfo uribuilder ){
         List<String> l = new ArrayList();
-        if( maxDurata.isEmpty() ){ maxDurata = "999999"; }
+        if( maxDurata.isEmpty() ){ maxDurata = "999999999"; }
         if( minDurata.isEmpty() ){ minDurata = "0"; }
         String sql;
         if( nomeDisco.isEmpty() ){
-            sql = "SELECT disco.id as idD, collezione.id as idC, collezione_condivisa.id_utente as idU FROM disco, dischi_collezione, collezione, collezione_condivisa WHERE collezione.id = collezione_condivisa.id_collezione AND collezione.id = dischi_collezione.id_collezione AND disco.id = dischi_collezione.id_disco AND privacy = 'condivisa' AND collezione.id_utente = " + idUser;
+            sql = "SELECT disco.id as idD, collezione.id as idC, collezione_condivisa.id_utente as idU FROM disco, dischi_collezione, collezione, collezione_condivisa WHERE collezione.id = collezione_condivisa.id_collezione AND collezione.id = dischi_collezione.id_collezione AND disco.id = dischi_collezione.id_disco AND privacy = 'condivisa' AND ( collezione.id_utente = "+ idUser +" OR collezione_condivisa.id_utente = "+ idUser +" )";
         }
         else{
-            sql = "SELECT disco.id as idD, collezione.id as idC, collezione_condivisa.id_utente as idU FROM disco, dischi_collezione, collezione, collezione_condivisa WHERE collezione.id = collezione_condivisa.id_collezione AND collezione.id = dischi_collezione.id_collezione AND disco.id = dischi_collezione.id_disco AND privacy = 'condivisa' AND disco.titolo = '" + nomeDisco + "' AND collezione.id_utente = " + idUser;
+            sql = "SELECT disco.id as idD, collezione.id as idC, collezione_condivisa.id_utente as idU FROM disco, dischi_collezione, collezione, collezione_condivisa WHERE collezione.id = collezione_condivisa.id_collezione AND collezione.id = dischi_collezione.id_collezione AND disco.id = dischi_collezione.id_disco AND privacy = 'condivisa' AND disco.titolo = '" + nomeDisco + "' AND ( collezione.id_utente = " + idUser +" OR collezione_condivisa.id_utente = "+ idUser +")";
         }
         try{
             Class.forName("com.mysql.jdbc.Driver");
@@ -487,13 +532,13 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
             String sql = "SELECT COUNT(*) as num FROM collezione WHERE privacy = 'pubblica' ";
             PreparedStatement pst = con.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
-            if( rs.next() ){
+            if( rs.next() && ( ! rs.getString("num").equals("0") )  ){
                 m.put("NUMERO DI COLLEZIONI PUBBLICHE:", rs.getString("num"));
                 
                 sql = "SELECT COUNT(idD) AS num FROM (select d.id as idD FROM disco d JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) WHERE c.privacy= 'pubblica' ) as dischi";
                 pst = con.prepareStatement(sql);
                 rs = pst.executeQuery();
-                if( rs.next() ){
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
                     m.put("NUMERO DI DISCHI PRESENTI NELLE COLLEZIONI PUBBLICHE: ", rs.getString("num") );
                 }
                 else{
@@ -503,7 +548,7 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
                 sql = "SELECT COUNT(idT) AS num, SUM(tracce.durata) as durata, AVG(tracce.durata) as durataMedia  FROM (select t.id as idT, t.durata as durata FROM disco d JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) JOIN tracce_disco td ON (td.id_disco = d.id) JOIN traccia t ON (t.id = td.id_traccia) WHERE c.privacy= 'pubblica' ) as tracce";
                 pst = con.prepareStatement(sql);
                 rs = pst.executeQuery();
-                if( rs.next() ){
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
                     m.put("NUMERO DI TRACCE PRESENTI NELLE COLLEZIONI PUBBLICHE: ", rs.getString("num") );
                     m.put("DURATA COMPLESSIVA DELLE TRACCE NELLE COLLEZIONI PUBBLICHE: ", rs.getString("durata"));
                     m.put("DURATA MEDIA DELLE TRACCE NELLE COLLEZIONI PUBBLICHE: ", rs.getString("durataMedia"));
@@ -516,7 +561,7 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
                 sql = "SELECT COUNT(idA) AS num FROM (select a.id as idA FROM autore a JOIN disco d ON (a.id = d.id_autore) JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) WHERE c.privacy= 'pubblica' ) as autori";
                 pst = con.prepareStatement(sql);
                 rs = pst.executeQuery();
-                if( rs.next() ){
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
                     m.put("NUMERO DI AUTORI PRESENTI NELLE COLLEZIONI PUBBLICHE: ", rs.getString("num") );
                 }
                 else {
@@ -546,13 +591,13 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
             String sql = "SELECT COUNT(*) as num FROM collezione WHERE privacy = 'privata' AND id_utente = "+ idUser;
             PreparedStatement pst = con.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
-            if( rs.next() ){
+            if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
                 m.put("NUMERO DI COLLEZIONI PRIVATE:", rs.getString("num"));
                 
                 sql = "SELECT COUNT(idD) AS num FROM (select d.id as idD FROM disco d JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) WHERE c.privacy= 'privata' AND c.id_utente = "+ idUser +" ) as dischi";
                 pst = con.prepareStatement(sql);
                 rs = pst.executeQuery();
-                if( rs.next() ){
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
                     m.put("NUMERO DI DISCHI PRESENTI NELLE COLLEZIONI PRIVATE: ", rs.getString("num") );
                 }
                 else{
@@ -562,7 +607,7 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
                 sql = "SELECT COUNT(idT) AS num, SUM(tracce.durata) as durata, AVG(tracce.durata) as durataMedia  FROM (select t.id as idT, t.durata as durata FROM disco d JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) JOIN tracce_disco td ON (td.id_disco = d.id) JOIN traccia t ON (t.id = td.id_traccia) WHERE c.privacy= 'privata' AND c.id_utente = "+ idUser +"  ) as tracce";
                 pst = con.prepareStatement(sql);
                 rs = pst.executeQuery();
-                if( rs.next() ){
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
                     m.put("NUMERO DI TRACCE PRESENTI NELLE COLLEZIONI PRIVATE: ", rs.getString("num") );
                     m.put("DURATA COMPLESSIVA DELLE TRACCE NELLE COLLEZIONI PRIVATE: ", rs.getString("durata"));
                     m.put("DURATA MEDIA DELLE TRACCE NELLE COLLEZIONI PRIVATE: ", rs.getString("durataMedia"));
@@ -575,7 +620,7 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
                 sql = "SELECT COUNT(idA) AS num FROM (select a.id as idA FROM autore a JOIN disco d ON (a.id = d.id_autore) JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) WHERE c.privacy= 'privata' AND c.id_utente = "+ idUser +" ) as autori";
                 pst = con.prepareStatement(sql);
                 rs = pst.executeQuery();
-                if( rs.next() ){
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
                     m.put("NUMERO DI AUTORI PRESENTI NELLE COLLEZIONI PRIVATE: ", rs.getString("num") );
                 }
                 else {
@@ -594,4 +639,61 @@ public class CollezioneAPIDummy implements CollezioneRepoAPI {
         return l;
     }
     
+    @Override
+    public List<Map<String, Object>> getStatisticheCondivise ( String idUser ){
+        List<Map<String, Object>> l = new ArrayList();
+        Map<String, Object> m = new HashMap();
+        try{    
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/collectorsite","root","");
+            String sql = "SELECT COUNT(*) as num FROM collezione WHERE privacy = 'condivisa' AND id_utente = "+ idUser;
+            PreparedStatement pst = con.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
+                m.put("NUMERO DI COLLEZIONI CONDIVISE:", rs.getString("num"));
+                
+                sql = "SELECT COUNT(idD) AS num FROM (select d.id as idD FROM disco d JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) WHERE c.privacy= 'condivisa' AND c.id_utente = "+ idUser +" ) as dischi";
+                pst = con.prepareStatement(sql);
+                rs = pst.executeQuery();
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
+                    m.put("NUMERO DI DISCHI PRESENTI NELLE COLLEZIONI CONDIVISE: ", rs.getString("num") );
+                }
+                else{
+                    m.put("NUMERO DI DISCHI PRESENTI NELLE COLLEZIONI CONDIVISE: ", 0 );
+                }
+                
+                sql = "SELECT COUNT(idT) AS num, SUM(tracce.durata) as durata, AVG(tracce.durata) as durataMedia  FROM (select t.id as idT, t.durata as durata FROM disco d JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) JOIN tracce_disco td ON (td.id_disco = d.id) JOIN traccia t ON (t.id = td.id_traccia) WHERE c.privacy= 'condivisa' AND c.id_utente = "+ idUser +"  ) as tracce";
+                pst = con.prepareStatement(sql);
+                rs = pst.executeQuery();
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
+                    m.put("NUMERO DI TRACCE PRESENTI NELLE COLLEZIONI CONDIVISE: ", rs.getString("num") );
+                    m.put("DURATA COMPLESSIVA DELLE TRACCE NELLE COLLEZIONI CONDIVISE: ", rs.getString("durata"));
+                    m.put("DURATA MEDIA DELLE TRACCE NELLE COLLEZIONI CONDIVISE: ", rs.getString("durataMedia"));
+
+                }
+                else{
+                    m.put("NUMERO DI TRACCE PRESENTI NELLE COLLEZIONI CONDIVISE: ", 0 );
+                }
+                
+                sql = "SELECT COUNT(idA) AS num FROM (select a.id as idA FROM autore a JOIN disco d ON (a.id = d.id_autore) JOIN dischi_collezione dc ON (d.id = dc.id_disco) JOIN collezione c ON (c.id = dc.id_collezione) WHERE c.privacy= 'condivisa' AND c.id_utente = "+ idUser +" ) as autori";
+                pst = con.prepareStatement(sql);
+                rs = pst.executeQuery();
+                if( rs.next() && ( ! rs.getString("num").equals("0") ) ){
+                    m.put("NUMERO DI AUTORI PRESENTI NELLE COLLEZIONI CONDIVISE: ", rs.getString("num") );
+                }
+                else {
+                    m.put("NUMERO DI AUTORI PRESENTI NELLE COLLEZIONI CONDIVISE: ", 0 );
+
+                }
+                l.add(m);
+            } 
+            else {
+                m.put("NUMERO DI COLLEZIONI CONDIVISE: ", 0);
+                l.add( m );
+            }
+            
+        } 
+        catch( Exception e ){ return null; }
+        return l;
+    }
 }

@@ -17,10 +17,6 @@ import resources.TracciaResource;
 import security.AutenticazioneResource;
 import security.LoggedFilter;
 
-/**
- *
- * @author didattica
- */
 @ApplicationPath("rest")
 public class RESTApp extends Application {
 
@@ -32,7 +28,6 @@ public class RESTApp extends Application {
         c.add(CollezioniResource.class);
         c.add(CollezioneResource.class);
         c.add(AutoriResource.class);
-        //c.add(AutoreResource.class);
         c.add(DischiResource.class);
         c.add(DiscoResource.class);
         c.add(TracceResource.class);
@@ -44,15 +39,8 @@ public class RESTApp extends Application {
 
         c.add(ObjectMapperContextResolver.class);
 
-        //esempio di autenticazione
         c.add(LoggedFilter.class);
-
-        //aggiungiamo il filtro che gestisce gli header CORS
-        //c.add(CORSFilter.class);
-
-        //esempio di exception mapper, che mappa in Response eccezioni non già derivanti da WebApplicationException
-        //c.add(AppExceptionMapper.class);
-
+        
         classes = Collections.unmodifiableSet(c);
     }
 

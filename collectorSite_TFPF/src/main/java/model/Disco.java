@@ -1,6 +1,5 @@
 package model;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import resources.CollezioniResource;
 import resources.DischiResource;
 import resources.DiscoResource;
 import resources.TracceResource;
-import resources.TracciaResource;
 
 public class Disco {
 

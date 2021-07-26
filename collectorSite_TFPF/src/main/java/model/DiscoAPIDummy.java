@@ -137,30 +137,6 @@ public class DiscoAPIDummy implements DiscoRepoAPI {
                     
                 }
             }
-            /*
-
-            if( disco.getTitolo().equals(rs.getString("titolo")) ){
-                    String sqlUpdateDisco = "UPDATE disco SET (titolo) VALUES ( '"+ disco.getTitolo() +"'   )";
-                    PreparedStatement pstUpdateDisco = con.prepareStatement(sqlUpdateDisco);
-                    pstUpdateDisco.executeUpdate();
-                    
-                    String sqlDeleteTraccia = "DELETE FROM traccia WHERE id = " + rs.getString("idT");
-                    PreparedStatement pstDeleteTraccia = con.prepareStatement(sqlDeleteTraccia);
-                    pstDeleteTraccia.execute();
-                    for( Traccia traccia : disco.getTracce() ){
-                        String sqlInsertTraccia = "INSERT INTO traccia (titolo, durata) SET ('"+ traccia.getTitolo() + "', '"+ traccia.getDurata() +"'  ) ";
-                        PreparedStatement pstInsertTraccia = con.prepareStatement(sqlInsertTraccia);
-                        pstInsertTraccia.execute();  
-                        
-                        
-                        
-                        String sqlInsertTraccia = "INSERT INTO tracce_disco ( id_traccia, id_disco ) SET ('"+ traccia.getTitolo() + "', '"+ traccia.getDurata() +"'  ) ";
-                        PreparedStatement pstInsertTraccia = con.prepareStatement(sqlInsertTraccia);
-                        pstInsertTraccia.execute();  
-                    }
-
-                }
-*/
             con.close();
         } 
         catch (SQLException ex) {
@@ -255,6 +231,7 @@ public class DiscoAPIDummy implements DiscoRepoAPI {
                                 sqlT = "SELECT * FROM traccia WHERE titolo = "+ traccia.getTitolo() +" AND durata = "+ traccia.getDurata();
                                 pstT = con.prepareStatement(sqlT);
                                 rsT = pstT.executeQuery();
+                                if( ! rsT.next() ){ return null; }
                             } 
                             String sqlInsertTD = "INSERT INTO tracce_disco ( id_traccia , id_disco ) VALUES ( "+ rsT.getString("id") + " , "+ rsD.getString("id") +" ) ";
                             PreparedStatement pstInsertTD = con.prepareStatement(sqlInsertTD);

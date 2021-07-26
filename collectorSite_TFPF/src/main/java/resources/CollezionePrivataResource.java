@@ -18,10 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
-import model.Autore;
 import model.Collezione;
-import model.CollezioneAPIDummy;
-import model.CollezioneRepoAPI;
 import model.Disco;
 import model.DiscoAPIDummy;
 import model.DiscoRepoAPI;
@@ -29,8 +26,6 @@ import model.RepoError;
 import model.Traccia;
 import model.TracciaAPIDummy;
 import model.TracciaRepoAPI;
-
-
 import rest.RESTWebApplicationException;
 import security.Logged;
 
@@ -70,7 +65,7 @@ public class CollezionePrivataResource {
         } catch (RepoError ex) {
             Logger.getLogger(CollezionePrivataResource.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return Response.ok( uri ).build();
+        return Response.created( uri ).entity(uri.toString()).build();
     }
     
     @PUT
@@ -170,7 +165,6 @@ public class CollezionePrivataResource {
         Map<String, Object> m;
         try {
             Disco d = api.getDisco(idDisco);
-            //URI uri = null;
             for( Traccia traccia : d.getTracce() ){
                 URI uri = null;
                 String idT = traccia.getId();
@@ -205,10 +199,5 @@ public class CollezionePrivataResource {
         catch (Exception ex) { throw new RESTWebApplicationException(ex); }
         
     }
-    
-
-    
-    
-    
-    
+     
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -15,7 +14,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,7 +24,6 @@ import model.CollezioneAPIDummy;
 import model.CollezioneCondivisa;
 import model.CollezioneRepoAPI;
 import model.RepoError;
-import model.Disco;
 import model.Utente;
 import rest.RESTWebApplicationException;
 import security.Logged;
@@ -211,7 +208,7 @@ public class CollezioniResource {
     @Path("pubblica/ricercaDisco")
     @Produces("application/json")
     public Response searchDiscoPubblico( @FormParam("nomeDisco") String nomeDisco, @FormParam("durataMaxDisco") String maxDurata, @FormParam("durataMinDisco") String minDurata, @Context UriInfo uribuilder ){
-        if( nomeDisco == null || maxDurata == null || minDurata == null ) return Response.ok("non we").build();;
+        if( nomeDisco == null || maxDurata == null || minDurata == null ) return Response.status(404).build();
         List<String> l = null;
         try {
             l = api.searchDiscoPubblico( nomeDisco, maxDurata, minDurata, uribuilder );
@@ -247,7 +244,7 @@ public class CollezioniResource {
 
     
     @GET
-    @Path("statistiche")
+    @Path("pubblica/statistiche")
     @Produces("application/json")
     public Response getStatistichePubbliche ( @Context UriInfo uribuilder ){
         List<Map<String, Object>> l = new ArrayList();
@@ -275,35 +272,21 @@ public class CollezioniResource {
         catch (RepoError ex) { return Response.serverError().build(); }  
           
     }
+    
+    @GET
+    @Path("condivisa/statistiche")
+    @Produces("application/json")
+    @Logged
+    public Response getStatisticheCondivise ( @Context SecurityContext sec, @Context UriInfo uribuilder ){
+        String idUser = sec.getUserPrincipal().getName();
+        List<Map<String, Object>> l = new ArrayList();
+        try {
+            l = api.getStatisticheCondivise( idUser );
+            return Response.ok(l).build();
 
-    
-    
-    /*
-    @GET
-    @Produces("application/json")
-    public List<Map<String, Object>> test1( @QueryParam("nome") String nome ){
-        List<Map<String, Object>> l = new ArrayList();
-        Map<String, Object> m = new HashMap();
-        if( nome != null ){
-            m.put( "nome", nome );
         }
-        else{
-            m.put( "nome", "Stecina" );
-        }
-        l.add( m );
-        return l;
+        catch (RepoError ex) { return Response.serverError().build(); }  
+          
     }
-    
-    @GET
-    @Produces("application/json")
-    @Path( "{anno: [1-9][0-9][0-9][0-9]}" )
-    public List<Map<String, Object>> test2( @PathParam("anno") int anno ){
-        List<Map<String, Object>> l = new ArrayList();
-        Map<String, Object> m = new HashMap();
-        m.put( "anno", anno );     
-        l.add( m );
-        return l;
-    }
-    uribuilder.getBaseUriBuilder().path( CollezioneResource.class ).path( CollezioneResource.class,"test2" ); // prenmde il path collezioni/anno
-    */
+
 }

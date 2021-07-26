@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">       
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        
+        <style>
+            #collezioni{ border-color: #8f0007; background: linear-gradient(#8f0007, #fd6f76); }
+            .collezione{ background-color: whitesmoke;  margin-top: 10px; margin-bottom: 10px; border: 3px solid #8f0007; margin-left: 10px; margin-right: 10px; }     
+            .disco{ background-color: whitesmoke; margin-top: 10px; margin-bottom: 10px; border-color: #fc010d; margin-left: 10px; margin-right: 10px; }
+            .traccia{ background-color: white; margin-top: 10px; margin-bottom: 10px; border-color: #fd6f76; margin-left: 10px; margin-right: 10px; }
+            .hidden{ display: none; }
+            a{ cursor: pointer; color: black; text-decoration: none; }
+            a:hover{ font-weight: bold; color: black; }
+            .title{ margin-top: 10px; color: #8f0007; }
+            .subtitle{ margin-top: 10px; color: white; }
+            .btn { background-color: #8f0007; border-color: #8f0007; color: white; }
+        </style>
+        <div class="container w-50" >
+            <div class="container text-center title">
+                <h1>TFPF COLLECTORS</h1>
+            </div>
+            <a href="http://localhost:8080/collectorSite_TFPF/Client/login.html" class="btn mb-3"><b>LOGIN</b></a>
+            <a href="http://localhost:8080/collectorSite_TFPF/Client/autori.html" class="btn mb-3"><b>AUTORI</b></a>
+
+            <div id="collezioni" class="card text-center">
+                <h3 class="subtitle" >COLLEZIONI PUBBLICHE</h3>
+            </div>
+        </div>
+
+     
+
+    </body>
+</html>
+	
+<script>
+
+    $(document).ready(function(){
+        
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:8080/collectorSite_TFPF/rest/v1/collezioni/pubblica',
+            success: function( response ){
+                response.forEach( function ( element, i ){
+                    var div = `<div class="collezione"><a class="urlCollezione">${element.url}</a></div>`;
+                    $( "#collezioni" ).append(div);
+                });               
+                $( '.collezione' ).each( function(){
+                    var collezione = this;
+                    $( collezione ).children('.urlCollezione').off().on( "click", function(){
+                        $( this ).parent().children( '.infoCollezione' ).toggleClass( 'hidden' );
+                        $( this ).parent().children( '.disco' ).toggleClass( 'hidden' );
+                    });
+                    $.ajax({
+                        type: 'GET',
+                        url: $( collezione ).children('.urlCollezione').text(),
+                        success: function( response ){
+                            var div = `<div class="infoCollezione hidden" ><b>Nome della collezione: ${response[0].titolo}</b></div>`;
+                            $( collezione ).append( div );
+                            response[0].dischi.forEach( function( d ){
+                                var div = `<div class="disco card hidden"><a class="urlDisco card">${d}</a></div>`;
+                                $( collezione ).append( div );
+                            });
+
+                            $( collezione ).children( '.disco' ).each( function(){
+                                var disco = this;
+                                $(disco).children('.urlDisco').off().on( "click", function(){                              
+                                    $( this ).parent().children( '.infoDisco' ).toggleClass( 'hidden' );
+                                    $( this ).parent().children( '.traccia' ).toggleClass( 'hidden' );
+                                });
+                                $.ajax({
+                                    type: 'GET',
+                                    url: $(disco).children('.urlDisco').text(),
+                                    success: function( response ){
+                                        var divTitolo = `<div class="infoDisco hidden" ><b>Titolo: ${response[0].titolo}</b></div>`;
+                                        var divAutore = `<div class="infoDisco hidden" ><b>Autore: ${response[0].autore}</b></div>`;
+                                        $( disco ).append( divTitolo );
+                                        $( disco ).append( divAutore );
+                                        response[0].tracce.forEach( function( t ){
+                                            var div = `<div class="traccia card hidden" ><a class="urlTraccia" >${t}</a></div>`;
+                                            $( disco ).append( div );
+                                        });
+                                        $( disco ).children( '.traccia' ).each( function(){
+                                            var traccia = this;
+                                            $(traccia).children('.urlTraccia').off().on( "click", function(){                              
+                                                $( this ).parent().children( '.infoTraccia' ).toggleClass( 'hidden' );
+                                            });
+                                            $.ajax({
+                                                type: 'GET',
+                                                url:  $(traccia).children('.urlTraccia').text(),
+                                                success: function( response ){
+                                                    var divTitolo = `<div class="infoTraccia hidden" ><b>Titolo: ${response.titolo}</b></div>`;
+                                                    var divDurata = `<div class="infoTraccia hidden" ><b>Durata: ${response.durata} sec</b></div>`;
+                                                    $( traccia ).append( divTitolo );
+                                                    $( traccia ).append( divDurata );
+                                                }
+                                            });   
+                                        });
+                                    }
+                                });
+                            });      
+                        }
+                    });
+                });   
+            },
+            error: function(){
+                window.location.assign('login.html');
+            }
+        });     
+
+    });
+
+</script>
+	
+</html>
+

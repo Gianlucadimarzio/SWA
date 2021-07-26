@@ -1,13 +1,11 @@
 package security;
 
 import java.io.IOException;
-import java.security.Key;
 import java.security.Principal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -32,7 +30,7 @@ public class LoggedFilter implements ContainerRequestFilter {
         String token = null;
         final String path = requestContext.getUriInfo().getAbsolutePath().toString();
         
-        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+        //String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         if (requestContext.getCookies().containsKey("token")) {
             token = requestContext.getCookies().get("token").getValue();
         }

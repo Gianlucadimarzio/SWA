@@ -27,8 +27,6 @@ import model.RepoError;
 import model.Traccia;
 import model.TracciaAPIDummy;
 import model.TracciaRepoAPI;
-
-
 import rest.RESTWebApplicationException;
 import security.Logged;
 
@@ -60,15 +58,15 @@ public class CollezioneCondivisaResource {
         List<Map<String, Object>> l = c.CollezioneCondivisaDummy( uribuilder, this.utenteShare );
         try {             
             String idUser = sec.getUserPrincipal().getName();
-            
-            if ( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ){
-                    return Response.ok(l).build();
-
-            }
+           
+            if ( ca.checkUtenteShare( c.getId() , this.utenteShare, idUser ) ){
+                return Response.ok(l).build();
+            }   
             else { return Response.status(Response.Status.UNAUTHORIZED).build(); }
-          
+         
         }
         catch (Exception ex) { throw new RESTWebApplicationException(ex); }
+
     }
 
     @GET
@@ -77,7 +75,6 @@ public class CollezioneCondivisaResource {
     @Logged
     public Response getDischi( @Context SecurityContext sec, @Context UriInfo uribuilder ){
         String idUser = sec.getUserPrincipal().getName();
-        if ( !c.getUtente().getId().equals( idUser ) ){ return Response.status(Response.Status.UNAUTHORIZED).build(); }
         List<Map<String, Object>> l = new ArrayList();
         Map<String, Object> m;
         for( Disco disco : this.c.getDischi() ){
@@ -91,13 +88,13 @@ public class CollezioneCondivisaResource {
         }
         CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
         try {
-            if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ) ){
-                return Response.status(Response.Status.UNAUTHORIZED).build();
-            } 
-        } catch (RepoError ex) {
-            Logger.getLogger(CollezioneCondivisaResource.class.getName()).log(Level.SEVERE, null, ex);
+            if ( ca.checkUtenteShare( c.getId() , this.utenteShare, idUser ) ){
+                return Response.ok(l).build();
+            }   
+            else { return Response.status(Response.Status.UNAUTHORIZED).build(); }
+
         }
-        return Response.ok(l).build();
+        catch (RepoError ex) { throw new RESTWebApplicationException(ex); }
     }
     
     @GET
@@ -106,7 +103,8 @@ public class CollezioneCondivisaResource {
     @Logged  
     public Response getDisco( @Context SecurityContext sec, @PathParam("idDisco") String idDisco, @Context UriInfo uribuilder ){
         String idUser = sec.getUserPrincipal().getName();
-        if( !c.getUtente().getId().equals(idUser) ) { return Response.status(Response.Status.UNAUTHORIZED).build(); } 
+                
+        //if( !c.getUtente().getId().equals(idUser) ) { return Response.status(Response.Status.UNAUTHORIZED).build(); } 
         
         Disco d = new Disco();
         try {
@@ -114,7 +112,7 @@ public class CollezioneCondivisaResource {
             List<Map<String, Object>> l = d.DiscoCondivisoDummy( this.utenteShare, this.c , uribuilder );
             if( d == null ) { return Response.status(Response.Status.NOT_FOUND).entity("Disco non trovato").build(); }
                 CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
-                if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ) ){
+                if ( !ca.checkUtenteShare( c.getId() , this.utenteShare, idUser ) ){
                     return Response.status(Response.Status.UNAUTHORIZED).build();
                 }
             
@@ -131,7 +129,6 @@ public class CollezioneCondivisaResource {
     @Logged 
     public Response getTracce( @Context SecurityContext sec, @PathParam("idDisco") String idDisco, @Context UriInfo uribuilder ){
         String idUser = sec.getUserPrincipal().getName();
-        if( !c.getUtente().getId().equals(idUser) ) { return Response.status(Response.Status.UNAUTHORIZED).build(); } 
         
         List<Map<String, Object>> l = new ArrayList();
         Map<String, Object> m;
@@ -147,7 +144,7 @@ public class CollezioneCondivisaResource {
                 l.add( m );
             }
             CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
-            if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ) ){
+            if ( !ca.checkUtenteShare( c.getId() , this.utenteShare, idUser ) ){
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
         } catch (RepoError ex) {
@@ -163,14 +160,13 @@ public class CollezioneCondivisaResource {
     @Logged
     public Response getTraccia( @Context SecurityContext sec, @PathParam("idTraccia") String id, @Context UriInfo uribuilder ){
         String idUser = sec.getUserPrincipal().getName();
-        if( !c.getUtente().getId().equals(idUser) ) { return Response.status(Response.Status.UNAUTHORIZED).build(); } 
         
         Traccia t = new Traccia();
         try {
             t = apiTraccia.getTraccia(id);
             if( t == null ) { return null; }
             CollezioneRepoAPI ca = new CollezioneAPIDummy(); 
-            if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare ) ) ){
+            if ( !( ( c.getUtente().getId().equals( idUser ) && idUser.equals( this.utenteShare ) ) || ca.checkUtenteShare( c.getId() , this.utenteShare, idUser ) ) ){
                     return Response.status(Response.Status.UNAUTHORIZED).build();
             }
             return Response.ok(t).build();           
@@ -186,7 +182,6 @@ public class CollezioneCondivisaResource {
     @Logged
     public Response InsertDisco( Disco d, @Context SecurityContext sec, @Context UriInfo uribuilder ){
         String idUser = sec.getUserPrincipal().getName();
-        if ( !c.getUtente().getId().equals( idUser ) ){ return Response.status(Response.Status.UNAUTHORIZED).build(); }
         URI uri = null;
         try {
             String id = api.insertDisco( this.c.getId(), d, idUser );
@@ -198,7 +193,7 @@ public class CollezioneCondivisaResource {
         } catch (RepoError ex) {
             Logger.getLogger(CollezionePrivataResource.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return Response.ok( uri.toString() ).build();
+        return Response.created(uri).entity(uri.toString()).build();
     }
     
     

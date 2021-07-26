@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package resources;
 
 import java.net.URI;
@@ -19,8 +14,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import model.Collezione;
 import model.Disco;
-import model.DiscoAPIDummy;
-import model.DiscoRepoAPI;
 import model.Traccia;
 import model.TracciaAPIDummy;
 import model.TracciaRepoAPI;
@@ -48,7 +41,7 @@ public class TracceResource {
         for( Traccia traccia : d.getTracce() ){
             m = new HashMap();
             m.put("titolo", traccia.getTitolo());
-            URI uri = this.uribuilder.getBaseUriBuilder().path( CollezioniResource.class).path( CollezioniResource.class, "getCollezione").path(CollezioneResource.class, "getDischi").path(DischiResource.class, "getDisco").path(DiscoResource.class, "getTracce").path(TracceResource.class, "getTraccia").build( this.c.getPrivacy(), this.c.getId(), this.d.getId(), traccia.getId());
+            URI uri = this.uribuilder.getBaseUriBuilder().path( CollezioniResource.class).path( CollezioniResource.class, "getCollezionePubblica").path(CollezioneResource.class, "getDischi").path(DischiResource.class, "getDisco").path(DiscoResource.class, "getTracce").path(TracceResource.class, "getTraccia").build( this.c.getId(), this.d.getId(), traccia.getId());
             m.put("url", uri.toString());
             l.add( m );
         }

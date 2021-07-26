@@ -6,13 +6,6 @@ import java.util.logging.Logger;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-/**
- *
- * @author didattica
- *
- * Una classe di utilità per provare i token JWT
- *
- */
 public class JWTHelpers {
 
     private static JWTHelpers instance = null;

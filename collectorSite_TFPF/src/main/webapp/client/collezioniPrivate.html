@@ -7,18 +7,67 @@
     <body>
         
         <style>
-            #collezioni{}
-            .collezione{ margin-top: 20px; border: 3px solid red; }     
-            .disco{ margin-top: 10px; border: 3px solid orange; }
-            .traccia{ margin-top: 10px; border: 3px solid yellow; }
+            #collezioniP{ border-color: #8f0007; background: linear-gradient(#8f0007, #fd6f76); }
+            #collezioni{ border-color: #8f0007; background: linear-gradient(#8f0007, #fd6f76); }
+            #autori{ border-color: #8f0007; background: linear-gradient(#8f0007, #fd6f76); }
+            .collezione{ background-color: whitesmoke;  margin-top: 10px; margin-bottom: 10px; border: 3px solid #8f0007; margin-left: 10px; margin-right: 10px; }     
+            .collezioneP{ background-color: whitesmoke;  margin-top: 10px; margin-bottom: 10px; border: 3px solid #8f0007; margin-left: 10px; margin-right: 10px; }     
+            .autore{ background-color: whitesmoke;  margin-top: 10px; margin-bottom: 10px; border: 3px solid #8f0007; margin-left: 10px; margin-right: 10px; }     
+            .disco{ background-color: whitesmoke; margin-top: 10px; margin-bottom: 10px; border-color: #fc010d; margin-left: 10px; margin-right: 10px; }
+            .discoP{ background-color: whitesmoke; margin-top: 10px; margin-bottom: 10px; border-color: #fc010d; margin-left: 10px; margin-right: 10px; }
+            .traccia{ background-color: white; margin-top: 10px; margin-bottom: 10px; border-color: #fd6f76; margin-left: 10px; margin-right: 10px; }
+            .tracciaP{ background-color: white; margin-top: 10px; margin-bottom: 10px; border-color: #fd6f76; margin-left: 10px; margin-right: 10px; }
             .hidden{ display: none; }
             a{ cursor: pointer; color: black; text-decoration: none; }
             a:hover{ font-weight: bold; color: black; }
+            li > label{ cursor: pointer; }
+            .title{ margin-top: 10px; color: #8f0007; }
+            .btn { background-color: #8f0007; border-color: #8f0007; }
         </style>
-        <div class="container text-center w-50" >
-            <div id="collezioni"></div>
-            <button id="btnLogout" class="mt-5" >LOGOUT</button>
+        
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <label class="navbar-brand"><b>COLLECTORSITE</b></label>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                  <label class="nav-link btn-collezione-privata font-weight-bold text-danger"><b>COLLEZIONI PRIVATE</b></label>
+              </li>
+              <li class="nav-item">
+                  <label class="nav-link btn-collezione-pubblica"><b>COLLEZIONI PUBBLICHE</b></label>
+              </li>
+              <li class="nav-item">
+                  <label class="nav-link btn-autore"><b>AUTORI</b></label>
+              </li>
+              
+              <li class="nav-item">
+                  <label id="btnLogout" class="float-right nav-link"><b>LOGOUT</b></label>
+              </li>
+              
+            </ul>
+        </nav>
+        
+        <!-- COLLEZIONI PRIVATE -->
+        <div class="c-pri container text-center w-50" >
+            <div class="container text-center title"><h1>COLLEZIONI PRIVATE</h1></div>
+            <div id="collezioni" class="card"></div>
+            
         </div>
+        
+        <!-- COLLEZIONI PUBBLICHE -->
+        <div class="c-pub container text-center w-50 hidden" >
+            <div class="container text-center title"><h1>COLLEZIONI PUBBLICHE</h1></div>
+            <div id="collezioniP" class="card"></div>   
+        </div>
+        
+        
+        <!-- AUTORI -->
+        <div class="c-pub container text-center w-50 aut hidden" >
+            <div class="container text-center title"><h1>AUTORI</h1></div>
+            <div id="autori" class="card text-center">
+            </div>  
+        </div>
+
+        
+
 
      
 
@@ -47,10 +96,10 @@
                         type: 'GET',
                         url: $( collezione ).children('.urlCollezione').text(),
                         success: function( response ){
-                            var div = `<div class="infoCollezione hidden" ><b>${response[0].titolo}</b></div>`;
+                            var div = `<div class="infoCollezione hidden" ><b>Nome della collezione: ${response[0].titolo}</b></div>`;
                             $( collezione ).append( div );
                             response[0].dischi.forEach( function( d ){
-                                var div = `<div class="disco hidden"><a class="urlDisco">${d}</a></div>`;
+                                var div = `<div class="disco card hidden"><a class="urlDisco card">${d}</a></div>`;
                                 $( collezione ).append( div );
                             });
 
@@ -64,12 +113,12 @@
                                     type: 'GET',
                                     url: $(disco).children('.urlDisco').text(),
                                     success: function( response ){
-                                        var divTitolo = `<div class="infoDisco hidden" ><b>${response[0].titolo}</b></div>`;
-                                        var divAutore = `<div class="infoDisco hidden" ><b>${response[0].autore}</b></div>`;
+                                        var divTitolo = `<div class="infoDisco hidden" ><b>Titolo: ${response[0].titolo}</b></div>`;
+                                        var divAutore = `<div class="infoDisco hidden" ><b>Autore: ${response[0].autore}</b></div>`;
                                         $( disco ).append( divTitolo );
                                         $( disco ).append( divAutore );
                                         response[0].tracce.forEach( function( t ){
-                                            var div = `<div class="traccia hidden" ><a class="urlTraccia" >${t}</a></div>`;
+                                            var div = `<div class="traccia card hidden" ><a class="urlTraccia" >${t}</a></div>`;
                                             $( disco ).append( div );
                                         });
                                         $( disco ).children( '.traccia' ).each( function(){
@@ -81,8 +130,8 @@
                                                 type: 'GET',
                                                 url:  $(traccia).children('.urlTraccia').text(),
                                                 success: function( response ){
-                                                    var divTitolo = `<div class="infoTraccia hidden" ><b>${response.titolo}</b></div>`;
-                                                    var divDurata = `<div class="infoTraccia hidden" ><b>${response.durata}</b></div>`;
+                                                    var divTitolo = `<div class="infoTraccia hidden" ><b>Titolo: ${response.titolo}</b></div>`;
+                                                    var divDurata = `<div class="infoTraccia hidden" ><b>Durata: ${response.durata} sec</b></div>`;
                                                     $( traccia ).append( divTitolo );
                                                     $( traccia ).append( divDurata );
                                                 }
@@ -90,51 +139,124 @@
                                         });
                                     }
                                 });
-                            });
-                        
-                        
+                            });      
                         }
                     });
-
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
                 });   
             },
             error: function(){
                 window.location.assign('login.html');
             }
         });
+         
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:8080/collectorSite_TFPF/rest/v1/collezioni/pubblica',
+            success: function( response ){
+                response.forEach( function ( element, i ){
+                    var div = `<div class="collezioneP"><a class="urlCollezioneP">${element.url}</a></div>`;
+                    $( "#collezioniP" ).append(div);
+                });               
+                $( '.collezioneP' ).each( function(){
+                    var collezione = this;
+                    $( collezione ).children('.urlCollezioneP').off().on( "click", function(){
+                        $( this ).parent().children( '.infoCollezioneP' ).toggleClass( 'hidden' );
+                        $( this ).parent().children( '.discoP' ).toggleClass( 'hidden' );
+                    });
+                    $.ajax({
+                        type: 'GET',
+                        url: $( collezione ).children('.urlCollezioneP').text(),
+                        success: function( response ){
+                            var div = `<div class="infoCollezioneP hidden" ><b>Nome della collezione: ${response[0].titolo}</b></div>`;
+                            $( collezione ).append( div );
+                            response[0].dischi.forEach( function( d ){
+                                var div = `<div class="discoP card hidden"><a class="urlDiscoP card">${d}</a></div>`;
+                                $( collezione ).append( div );
+                            });
+
+                            $( collezione ).children( '.discoP' ).each( function(){
+                                var disco = this;
+                                $(disco).children('.urlDiscoP').off().on( "click", function(){                              
+                                    $( this ).parent().children( '.infoDiscoP' ).toggleClass( 'hidden' );
+                                    $( this ).parent().children( '.tracciaP' ).toggleClass( 'hidden' );
+                                });
+                                $.ajax({
+                                    type: 'GET',
+                                    url: $(disco).children('.urlDiscoP').text(),
+                                    success: function( response ){
+                                        var divTitolo = `<div class="infoDiscoP hidden" ><b>Titolo: ${response[0].titolo}</b></div>`;
+                                        var divAutore = `<div class="infoDiscoP hidden" ><b>Autore: ${response[0].autore}</b></div>`;
+                                        $( disco ).append( divTitolo );
+                                        $( disco ).append( divAutore );
+                                        response[0].tracce.forEach( function( t ){
+                                            var div = `<div class="tracciaP card hidden" ><a class="urlTracciaP" >${t}</a></div>`;
+                                            $( disco ).append( div );
+                                        });
+                                        $( disco ).children( '.tracciaP' ).each( function(){
+                                            var traccia = this;
+                                            $(traccia).children('.urlTracciaP').off().on( "click", function(){                              
+                                                $( this ).parent().children( '.infoTracciaP' ).toggleClass( 'hidden' );
+                                            });
+                                            $.ajax({
+                                                type: 'GET',
+                                                url:  $(traccia).children('.urlTracciaP').text(),
+                                                success: function( response ){
+                                                    var divTitolo = `<div class="infoTracciaP hidden" ><b>Titolo: ${response.titolo}</b></div>`;
+                                                    var divDurata = `<div class="infoTracciaP hidden" ><b>Durata: ${response.durata} sec</b></div>`;
+                                                    $( traccia ).append( divTitolo );
+                                                    $( traccia ).append( divDurata );
+                                                }
+                                            });   
+                                        });
+                                    }
+                                });
+                            });      
+                        }
+                    });
+                });   
+            },
+            error: function(){
+                window.location.assign('login.html');
+            }    
+        });
+        
+
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:8080/collectorSite_TFPF/rest/v1/autori',
+            success: function( response ){
+                response.forEach( function ( element, i ){
+                    var div = `<div class="autore"><a class="urlAutore">${element.url}</a></div>`;
+                    $( "#autori" ).append(div);
+                });               
+                $( '.autore' ).each( function(){
+                    var autore = this;
+                    $( autore ).children('.urlAutore').off().on( "click", function(){
+                        $( this ).parent().children( '.infoAutore' ).toggleClass( 'hidden' );
+                        $( this ).parent().children( '.disco' ).toggleClass( 'hidden' );
+                    });
+                    $.ajax({
+                        type: 'GET',
+                        url: $( autore ).children('.urlAutore').text(),
+                        success: function( response ){
+                            var div = `<div class="infoAutore hidden" >
+                                            <b>Nome dell'autore: ${response.nome}</b>
+                                            <br>
+                                            <b>Cognome dell'autore: ${response.cognome}</b>
+                                        </div>`;
+
+                            $( autore ).append( div );    
+                        }
+                    });
+                });   
+            },
+            error: function(){
+                window.location.assign('login.html');
+            }
+        });     
+
+        
+        
         
         $( "#btnLogout" ).click( function(){
             $.ajax({ 
@@ -147,27 +269,38 @@
         });
         
         
+        $('.btn-collezione-privata').click( function(){
+            $('.c-pri').removeClass('hidden');
+            $('.c-pub').addClass('hidden');
+            $('.aut').addClass('hidden');
+            $('.btn-collezione-privata').addClass('text-danger');
+            $('.btn-collezione-pubblica').removeClass('text-danger');
+            $('.btn-autore').removeClass('text-danger');
+        });
         
-       
- 
-    
-    
-    
-
+        $('.btn-collezione-pubblica').click( function(){
+            $('.c-pub').removeClass('hidden');
+            $('.c-pri').addClass('hidden');
+            $('.aut').addClass('hidden');
+            $('.btn-collezione-privata').removeClass('text-danger');
+            $('.btn-collezione-pubblica').addClass('text-danger');
+            $('.btn-autore').removeClass('text-danger');
+        });
         
-
+        $('.btn-autore').click( function(){
+            $('.c-pub').addClass('hidden');
+            $('.c-pri').addClass('hidden');
+            $('.aut').removeClass('hidden');
+            $('.btn-collezione-privata').removeClass('text-danger');
+            $('.btn-collezione-pubblica').removeClass('text-danger');
+            $('.btn-autore').addClass('text-danger');        });
+        
+         
+        
 
     });
 
 </script>
-	
-	
-	
-	
-	
-	
-	
-	
 	
 </html>
 

@@ -15,7 +15,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import static javax.ws.rs.core.Response.ok;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import model.Collezione;
@@ -47,20 +46,13 @@ public class DischiResource {
             m = new HashMap();
             m.put("titolo", disco.getTitolo());
             
-            URI uri = null;
-            if( c.getPrivacy().equals("privata") ){
-                uri = this.uribuilder.getBaseUriBuilder().path( CollezioniResource.class).path( CollezioniResource.class, "getCollezionePrivata").path(CollezioneResource.class, "getDischi").path(DischiResource.class, "getDisco").build( this.c.getId(), disco.getId() );
-            }
-            if( c.getPrivacy().equals("pubblica") ){
-                uri = this.uribuilder.getBaseUriBuilder().path( CollezioniResource.class).path( CollezioniResource.class, "getCollezionePubblica").path(CollezioneResource.class, "getDischi").path(DischiResource.class, "getDisco").build( this.c.getId(), disco.getId() );
-            }
-            if( c.getPrivacy().equals("condivisa") ){
-                uri = this.uribuilder.getBaseUriBuilder().path( CollezioniResource.class).path( CollezioniResource.class, "getCollezioneCondivisa").path(CollezioneResource.class, "getDischi").path(DischiResource.class, "getDisco").build( this.c.getId(), disco.getId() );
-            }
+            URI uri = null;     
+            uri = this.uribuilder.getBaseUriBuilder().path( CollezioniResource.class).path( CollezioniResource.class, "getCollezionePubblica").path(CollezioneResource.class, "getDischi").path(DischiResource.class, "getDisco").build( this.c.getId(), disco.getId() );
             m.put("url", uri.toString());
             l.add( m );
         }
         return Response.ok(l).build();
+                
     }
     
     @Path("{ idDisco: [0-9]+ }")
@@ -94,7 +86,7 @@ public class DischiResource {
         } catch (RepoError ex) {
             Logger.getLogger(CollezionePrivataResource.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return Response.ok( uri.toString() ).build();
+        return Response.created(uri).entity(uri.toString() ).build();
     }
     
 }

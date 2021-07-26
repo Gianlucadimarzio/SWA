@@ -1,6 +1,5 @@
 package model;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import resources.CollezioneCondivisaResource;
 import resources.CollezioneResource;
 import resources.CollezioniResource;
 import resources.DischiResource;
-import resources.DiscoResource;
 
 
 public class Collezione {

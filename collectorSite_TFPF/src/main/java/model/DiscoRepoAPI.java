@@ -1,6 +1,5 @@
 package model;
 
-import java.net.URI;
 import java.util.List;
 import javax.ws.rs.core.UriInfo;
 
