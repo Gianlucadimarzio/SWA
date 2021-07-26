@@ -10,29 +10,28 @@
     </head>
     <body>
         <style>
-             .title{ margin-top: 10px; color: #8f0007; }
-             #btn { background-color: #8f0007; border-color: #8f0007; }
-             .input{ border: none; border-bottom: solid 2px #8f0007;  }
-             #a{ cursor: pointer; text-decoration: none; }
+            #container{ width: 45% !important; text-align: center; }
+            .title{ margin-top: 10px; color: #8f0007; }
+            #btn { background-color: #8f0007; border-color: #8f0007; }
+            .input{ border: none; border-bottom: solid 2px #8f0007;  }
+            #a{ cursor: pointer; text-decoration: none; }
+            #cont{ margin-right: 4pc; margin-left: 4pc; }
         </style>
-        <div id="container">
-            <h1 class="title" >TFPF COLLECTORS</h1>
+        <div id="container">                
+            <h1 class="title mb-3" ><img id="logo" src="tfpf.jpg" height="65px">COLLECTORS</h1>             
             <div class="card">
                 <h3 class="title" >LOGIN</h3>
-                <form method="POST" id="form" class="mx-auto mb-3 mt-3">
-                    <label for="username">Username</label>
-                    <input class="input" name="username" id="username" type="text" required>
-                    <br>
-                    <label for="password">Password</label>
-                    <input class="input" name="password" id="password" type="password" required>
-                    <br>
-                    <button id="btn" type="submit">INVIA</button>
+                <form method="POST" id="form">
+                    <div id="cont" class="mr-4 ml-3 mb-3 mt-3">
+                        <label for="username">Username</label>
+                        <input class="input" name="username" id="username" type="text" required>
+                        <br>
+                        <label for="password">Password</label>
+                        <input class="input" name="password" id="password" type="password" required>
+                        <br>
+                        <button id="btn" type="submit">INVIA</button>  
+                    </div>
                 </form> 
-                <div class="mb-3 mx-auto">
-                    <hr>
-                    <a href="http://localhost:8080/collectorSite_TFPF/Client/collezioniPubbliche.html" id="a"><b>Visualizza collezioni pubbliche</b></a>
-                </div>
-                
             </div>
             
         </div>
@@ -52,7 +51,7 @@
               type: 'POST',
               url: 'http://localhost:8080/collectorSite_TFPF/rest/v1/login',
               data: $('#form').serialize(),
-              success: function () { window.location.assign('collezioniPrivate.html'); },
+              success: function () { window.location.assign('collezioni.html'); },
               error: function () { alert('Credenziali non Valide!'); }
             });
         });
